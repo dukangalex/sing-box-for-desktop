@@ -26,6 +26,8 @@ import {
   PROFILE_EDITOR_WINDOW_DIRTY,
   PROFILE_EDITOR_WINDOW_OPEN,
   PROFILE_FILE_IMPORT,
+  PROFILE_CHAINS_CALL,
+  PROFILE_CHAINS_CHANGED,
   PROFILES_CALL,
   PROFILES_CHANGED,
   REPORTS_CALL,
@@ -70,6 +72,10 @@ async function callResult<T>(channel: string, method: string, ...callArguments: 
 
 function callProfiles<T>(method: string, ...callArguments: unknown[]): Promise<T> {
   return callResult(PROFILES_CALL, method, ...callArguments);
+}
+
+function callProfileChains<T>(method: string, ...callArguments: unknown[]): Promise<T> {
+  return callResult(PROFILE_CHAINS_CALL, method, ...callArguments);
 }
 
 function callSettings<T>(method: string, ...callArguments: unknown[]): Promise<T> {
@@ -205,6 +211,21 @@ const bridge: DesktopBridge = {
   servers: {
     load: () => callServers("load"),
     save: (state) => callServers("save", state),
+  },
+  profileChains: {
+    list: (profileId) => callProfileChains("list", profileId),
+    listChainableOutbounds: (profileId) => callProfileChains("listChainableOutbounds", profileId),
+    create: (init) => callProfileChains("create", init),
+    update: (id, patch) => callProfileChains("update", id, patch),
+    remove: (id) => callProfileChains("remove", id),
+    reorder: (profileId, ids) => callProfileChains("reorder", profileId, ids),
+    onChanged: (listener) => {
+      const handler = (_event: IpcRendererEvent, profileId: string) => listener(profileId);
+      ipcRenderer.on(PROFILE_CHAINS_CHANGED, handler);
+      return () => {
+        ipcRenderer.removeListener(PROFILE_CHAINS_CHANGED, handler);
+      };
+    },
   },
   preferences: {
     initial: ipcRenderer.sendSync(PREFERENCES_SNAPSHOT) as Record<string, unknown>,

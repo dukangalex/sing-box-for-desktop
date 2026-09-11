@@ -157,7 +157,16 @@ function createSchema(store: SettingsDatabase): void {
       url TEXT NOT NULL,
       secret TEXT NOT NULL,
       item_order INTEGER NOT NULL
-    );`,
+    );
+    CREATE TABLE IF NOT EXISTS profile_chains (
+      id TEXT PRIMARY KEY,
+      profile_id TEXT NOT NULL,
+      name TEXT NOT NULL,
+      hops TEXT NOT NULL,
+      item_order INTEGER NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS profile_chains_profile_id
+      ON profile_chains (profile_id);`,
   );
 }
 

@@ -16,6 +16,7 @@ import type {
 } from "../shared/ipc";
 import { writeApplicationCacheFile } from "./appCache";
 import { desktopService } from "./daemon";
+import { applyChainBindings } from "./profileChains";
 import { Preference, settingsDatabase } from "./database";
 import { serviceStartOptions } from "./settings";
 import { userAgent } from "./userAgent";
@@ -153,6 +154,14 @@ export function onProfilesChanged(listener: () => void) {
 
 export function profilesState(): ProfilesState {
   return { selectedId: selectedProfileId(), profiles: listProfiles() };
+}
+
+// Reads a profile's base config exactly as stored on disk — before any
+// chain-binding transform is applied. Used by profileChains.ts to list
+// candidate outbound tags; never write to contentPath from that module.
+export async function readProfileContent(id: string): Promise<string> {
+  findProfile(id);
+  return await readFile(contentPath(id), "utf-8");
 }
 
 function notifyChanged() {
@@ -346,7 +355,8 @@ async function reloadIfSelectedAndRunning(id: string): Promise<void> {
   if (daemonState.status !== ServiceStatus_Type.STARTED) {
     return;
   }
-  await startServiceWithContent(await readFile(contentPath(id), "utf-8"));
+  const content = await readFile(contentPath(id), "utf-8");
+  await startServiceWithContent(applyChainBindings(id, content));
 }
 
 function intervalOrDefault(profile: ProfileMetadata): number {
@@ -403,7 +413,7 @@ export async function startSelectedProfile(): Promise<void> {
     throw new Error("no profile selected");
   }
   const content = await readFile(contentPath(selectedId), "utf-8");
-  await startServiceWithContent(content);
+  await startServiceWithContent(applyChainBindings(selectedId, content));
 }
 
 let updateTimer: NodeJS.Timeout | null = null;

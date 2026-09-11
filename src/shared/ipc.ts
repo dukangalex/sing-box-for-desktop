@@ -178,6 +178,48 @@ export interface ServersBridge {
   save(state: { servers: Array<{ id: string; name: string; url: string; secret: string }>; activeId: string | null }): Promise<void>;
 }
 
+export const PROFILE_CHAINS_CALL = "profileChains:call";
+export const PROFILE_CHAINS_CHANGED = "profileChains:changed";
+
+// A chain is an ordered list of outbound tags already present in a profile's
+// base config (its "hops"). Applied at service-start time via
+// applyChainBindings; the base config file on disk is never rewritten.
+export interface ProfileChain {
+  id: string;
+  profileId: string;
+  name: string;
+  hops: string[];
+}
+
+export interface ProfileChainCreate {
+  profileId: string;
+  name: string;
+  hops: string[];
+}
+
+export interface ProfileChainPatch {
+  name?: string;
+  hops?: string[];
+}
+
+// Outbound tags found in a profile's base config that are eligible to be
+// used as a chain hop (concrete proxy outbounds only — direct/block/dns,
+// and existing selector/urltest groups, are excluded).
+export interface ProfileChainableOutbound {
+  tag: string;
+  type: string;
+}
+
+export interface ProfileChainsBridge {
+  list(profileId: string): Promise<ProfileChain[]>;
+  listChainableOutbounds(profileId: string): Promise<ProfileChainableOutbound[]>;
+  create(init: ProfileChainCreate): Promise<ProfileChain>;
+  update(id: string, patch: ProfileChainPatch): Promise<void>;
+  remove(id: string): Promise<void>;
+  reorder(profileId: string, ids: string[]): Promise<void>;
+  onChanged(listener: (profileId: string) => void): () => void;
+}
+
 export interface PreferencesBridge {
   initial: Record<string, unknown>;
   set(name: string, value: unknown): Promise<void>;
@@ -443,6 +485,7 @@ export interface DesktopBridge {
   core: CoreBridge;
   reports: ReportsBridge;
   profiles: ProfilesBridge;
+  profileChains: ProfileChainsBridge;
   servers: ServersBridge;
   preferences: PreferencesBridge;
   terminal: TerminalBridge;

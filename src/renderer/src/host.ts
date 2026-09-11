@@ -123,6 +123,15 @@ export function createDesktopHost(): DesktopHost {
       load: () => bridge.servers.load(),
       save: (state) => bridge.servers.save(state),
     },
+    profileChains: {
+      list: (profileId) => bridge.profileChains.list(profileId),
+      listChainableOutbounds: (profileId) => bridge.profileChains.listChainableOutbounds(profileId),
+      create: (init) => bridge.profileChains.create(init),
+      update: (id, patch) => bridge.profileChains.update(id, patch),
+      remove: (id) => bridge.profileChains.remove(id),
+      reorder: (profileId, ids) => bridge.profileChains.reorder(profileId, ids),
+      onChanged: (listener) => bridge.profileChains.onChanged(listener),
+    },
     configuration: {
       check: async (content) => {
         await applicationClient.checkConfig({ content });

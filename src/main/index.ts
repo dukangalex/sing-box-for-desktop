@@ -34,6 +34,7 @@ import { registerNotifications } from "./notifications";
 import { registerPreferences } from "./preferences";
 import { registerOpenConnectBrowser } from "./openConnectBrowser";
 import { registerProfileEditorWindows } from "./profileEditorWindows";
+import { registerProfileChains } from "./profileChains";
 import { registerProfiles } from "./profiles";
 import { registerSetup } from "./repair";
 import { registerReports } from "./reports";
@@ -484,6 +485,7 @@ if (!singleInstanceLock) {
     registerReports();
     registerPreferences();
     registerProfiles();
+    registerProfileChains();
     registerServers();
     registerSettings(updateTrayVisibility);
     registerTaildrop();
