@@ -32,7 +32,7 @@ import {
 import { requireHttpsUrl } from "./remoteUrlGuard";
 import { daemonState } from "./state";
 import { webdavDownload, webdavProbe, webdavUpload } from "./webdavClient";
-import { createZip, isZipBuffer, readZip } from "./zipArchive";
+import { createZip, isZipBuffer, readZip, type ZipEntry } from "./zipArchive";
 
 async function stopRunningService(): Promise<void> {
   const status = daemonState.status;
@@ -47,7 +47,7 @@ async function stopRunningService(): Promise<void> {
 async function buildArchive(): Promise<Buffer> {
   const live = profilesState();
   const portable: PortableProfile[] = [];
-  const configs = new Map<string, Buffer>();
+  const configs = new Map<string, Uint8Array>();
   for (const [index, profile] of live.profiles.entries()) {
     const content = await readProfileContent(profile.id);
     const rel = `configs/${profile.id}.json`;
@@ -67,7 +67,7 @@ async function buildArchive(): Promise<Buffer> {
   }
   const settings = snapshotPortableSettings();
   const time = Date.now();
-  const entries = [
+  const entries: ZipEntry[] = [
     { name: MANIFEST_NAME, data: Buffer.from(JSON.stringify(manifest("windows", time)), "utf-8") },
     {
       name: PROFILES_NAME,
