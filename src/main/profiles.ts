@@ -158,6 +158,13 @@ export function listProfileMetadata(): ProfileMetadata[] {
   return listProfiles();
 }
 
+export function profilesState(): ProfilesState {
+  return {
+    selectedId: selectedProfileId(),
+    profiles: listProfiles(),
+  };
+}
+
 export interface PortableProfileImport {
   id: string;
   name: string;
