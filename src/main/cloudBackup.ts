@@ -26,7 +26,6 @@ import {
 } from "./portableCloud";
 import {
   importPortableProfiles,
-  listProfileMetadata,
   profilesState,
   readProfileContent,
 } from "./profiles";
@@ -233,10 +232,14 @@ const handlers: Record<string, (...args: never[]) => Promise<unknown>> = {
   async exportFile(): Promise<boolean> {
     const window = BrowserWindow.getFocusedWindow();
     const zip = await buildArchive();
-    const result = await dialog.showSaveDialog(window ?? undefined, {
+    const options = {
       defaultPath: "backup.zip",
       filters: [{ name: "AngelaBox backup", extensions: ["zip"] }],
-    });
+    };
+    const result =
+      window === null
+        ? await dialog.showSaveDialog(options)
+        : await dialog.showSaveDialog(window, options);
     if (result.canceled || result.filePath === undefined) {
       return false;
     }
@@ -246,10 +249,14 @@ const handlers: Record<string, (...args: never[]) => Promise<unknown>> = {
 
   async importFile(compat: boolean): Promise<{ imported: number; skipped: number } | null> {
     const window = BrowserWindow.getFocusedWindow();
-    const result = await dialog.showOpenDialog(window ?? undefined, {
+    const options = {
       filters: [{ name: "AngelaBox backup", extensions: ["zip"] }],
-      properties: ["openFile"],
-    });
+      properties: ["openFile" as const],
+    };
+    const result =
+      window === null
+        ? await dialog.showOpenDialog(options)
+        : await dialog.showOpenDialog(window, options);
     if (result.canceled || result.filePaths.length === 0) {
       return null;
     }

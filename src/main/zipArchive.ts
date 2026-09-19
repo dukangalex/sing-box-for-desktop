@@ -42,7 +42,7 @@ function writeU32(target: Buffer, offset: number, value: number): void {
 
 export interface ZipEntry {
   name: string;
-  data: Buffer;
+  data: Uint8Array;
 }
 
 function assertSafeName(name: string): string {
