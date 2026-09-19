@@ -20,9 +20,9 @@ import { daemonBinaryPath } from "./repair";
 
 function workerEndpoint(): string {
   if (process.platform === "win32") {
-    return `\\\\.\\pipe\\sing-box-worker.${randomUUID()}`;
+    return `\\\\.\\pipe\\angelabox-worker.${randomUUID()}`;
   }
-  return join(tmpdir(), `sing-box-worker.${randomUUID().slice(0, 8)}.sock`);
+  return join(tmpdir(), `angelabox-worker.${randomUUID().slice(0, 8)}.sock`);
 }
 
 interface WorkerProcess {

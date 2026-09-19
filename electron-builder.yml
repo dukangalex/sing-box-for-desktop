@@ -1,4 +1,4 @@
-productName: sing-box
+productName: AngelaBox
 copyright: nekohasekai
 publish: null
 afterPack: scripts/afterPack.cjs
@@ -43,7 +43,7 @@ fileAssociations:
     description: sing-box profile
     mimeType: application/x-sing-box-profile
 win:
-  appId: io.nekohasekai.sfw
+  appId: io.chainbox.desktop
   forceCodeSigning: true
   icon: resources/icon.ico
   signtoolOptions:
@@ -74,7 +74,7 @@ win:
       to: native/windows_share.node
   target:
     - nsis
-  artifactName: SFW-${version}-${env.SFW_ARCHITECTURE}.${ext}
+  artifactName: AngelaBox-windows-${env.SFW_ARCHITECTURE}.${ext}
 nsis:
   oneClick: false
   buildUniversalInstaller: false
@@ -89,7 +89,7 @@ nsis:
   allowToChangeInstallationDirectory: false
   deleteAppDataOnUninstall: false
   include: build/installer.nsh
-  artifactName: SFW-${version}-${env.SFW_ARCHITECTURE}.${ext}
+  artifactName: AngelaBox-windows-${env.SFW_ARCHITECTURE}.${ext}
 linux:
   appId: io.nekohasekai.sfl
   syncDesktopName: true

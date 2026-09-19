@@ -1,3 +1,15 @@
+# AngelaBox desktop
+
+This `angelabox` branch is the AngelaBox overlay on official [sing-box-for-desktop](https://github.com/SagerNet/sing-box-for-desktop). `main` stays an unmodified upstream mirror.
+
+Identity (product name, exe, service, registry) is frozen in [dukangalex/AngelaBox `docs/IDENTITY.md`](https://github.com/dukangalex/AngelaBox/blob/dev/docs/IDENTITY.md). Cloud backup format: [docs/BACKUP.md](https://github.com/dukangalex/AngelaBox/blob/dev/docs/BACKUP.md).
+
+Do not publish `SFW-*.exe`. Do not string-replace official SFW at CI time.
+
+---
+
+Official upstream README follows.
+
 # sing-box-for-desktop
 
 Experimental Windows client for sing-box, the universal proxy platform.

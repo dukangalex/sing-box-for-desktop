@@ -17,6 +17,8 @@ import type {
 import { writeApplicationCacheFile } from "./appCache";
 import { desktopService } from "./daemon";
 import { applyChainBindings } from "./profileChains";
+import { applyAngelaBoxOverlays } from "./overlayApply";
+import { loadOverlaySettings } from "./overlaySettings";
 import { Preference, settingsDatabase } from "./database";
 import { serviceStartOptions } from "./settings";
 import { userAgent } from "./userAgent";
@@ -152,8 +154,100 @@ export function onProfilesChanged(listener: () => void) {
   changeListeners.push(listener);
 }
 
-export function profilesState(): ProfilesState {
-  return { selectedId: selectedProfileId(), profiles: listProfiles() };
+export function listProfileMetadata(): ProfileMetadata[] {
+  return listProfiles();
+}
+
+export interface PortableProfileImport {
+  id: string;
+  name: string;
+  type: ProfileType;
+  remoteUrl?: string;
+  autoUpdate: boolean;
+  autoUpdateIntervalMinutes: number;
+  lastUpdated?: number;
+  content: string;
+}
+
+export async function importPortableProfiles(options: {
+  mode: "overwrite" | "compat";
+  selected: string | null;
+  profiles: PortableProfileImport[];
+}): Promise<{ imported: number; skipped: number }> {
+  const store = settingsDatabase();
+  if (options.mode === "overwrite") {
+    const existing = listProfiles();
+    store.transaction(() => {
+      store.prepare("DELETE FROM profile_chains").run();
+      store.prepare("DELETE FROM profiles").run();
+      writeSelectedProfileId(null);
+    })();
+    await Promise.all(
+      existing.map(async (profile) => {
+        try {
+          await unlink(contentPath(profile.id));
+        } catch (error) {
+          if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+            throw error;
+          }
+        }
+      }),
+    );
+  }
+  const known = listProfiles();
+  const names = new Set(known.map((profile) => profile.name.trim()).filter((name) => name !== ""));
+  const urls = new Set(
+    known
+      .map((profile) => profile.remoteUrl?.trim() ?? "")
+      .filter((url) => url !== ""),
+  );
+  const ids = new Set(known.map((profile) => profile.id));
+  let imported = 0;
+  let skipped = 0;
+  let firstId: string | null = null;
+  for (const item of options.profiles) {
+    if (options.mode === "compat") {
+      const name = item.name.trim();
+      const url = item.remoteUrl?.trim() ?? "";
+      if (ids.has(item.id) || names.has(name) || (url !== "" && urls.has(url))) {
+        skipped += 1;
+        continue;
+      }
+    }
+    const profile: ProfileMetadata = {
+      id: options.mode === "overwrite" || !ids.has(item.id) ? item.id : crypto.randomUUID(),
+      name: options.mode === "overwrite" ? item.name : uniqueName(item.name),
+      type: item.type,
+      autoUpdate: item.autoUpdate,
+      autoUpdateIntervalMinutes: Math.max(
+        item.autoUpdateIntervalMinutes,
+        MINIMUM_UPDATE_INTERVAL_MINUTES,
+      ),
+    };
+    if (item.remoteUrl) {
+      profile.remoteUrl = item.remoteUrl;
+    }
+    if (item.lastUpdated !== undefined) {
+      profile.lastUpdated = item.lastUpdated;
+    }
+    await insertProfile(profile, item.content, options.mode === "overwrite");
+    imported += 1;
+    firstId ??= profile.id;
+    names.add(profile.name.trim());
+    ids.add(profile.id);
+    if (profile.remoteUrl) {
+      urls.add(profile.remoteUrl);
+    }
+  }
+  if (options.mode === "overwrite") {
+    if (options.selected !== null && ids.has(options.selected)) {
+      writeSelectedProfileId(options.selected);
+    } else if (firstId !== null) {
+      writeSelectedProfileId(firstId);
+    }
+    notifyChanged();
+  }
+  return { imported, skipped };
 }
 
 // Reads a profile's base config exactly as stored on disk — before any
@@ -248,6 +342,7 @@ async function fetchRemoteContent(remoteUrl: string): Promise<string> {
 async function insertProfile(
   profile: ProfileMetadata,
   content: string,
+  select = true,
 ): Promise<ProfileMetadata> {
   await atomicWriteFile(contentPath(profile.id), content);
   const store = settingsDatabase();
@@ -277,7 +372,9 @@ async function insertProfile(
         profile.lastUpdated ?? null,
         nextOrder,
       );
-    writeSelectedProfileId(profile.id);
+    if (select) {
+      writeSelectedProfileId(profile.id);
+    }
   })();
   notifyChanged();
   reconfigureAutoUpdate();
@@ -356,7 +453,7 @@ async function reloadIfSelectedAndRunning(id: string): Promise<void> {
     return;
   }
   const content = await readFile(contentPath(id), "utf-8");
-  await startServiceWithContent(applyChainBindings(id, content));
+  await startServiceWithContent(await overlaidContent(id, content));
 }
 
 function intervalOrDefault(profile: ProfileMetadata): number {
@@ -407,13 +504,22 @@ export async function selectProfile(id: string): Promise<void> {
   await reloadIfSelectedAndRunning(id);
 }
 
+async function overlaidContent(id: string, content: string): Promise<string> {
+  const chained = applyChainBindings(id, content);
+  const configs = new Map<string, string>();
+  for (const profile of listProfiles()) {
+    configs.set(profile.id, await readFile(contentPath(profile.id), "utf-8"));
+  }
+  return applyAngelaBoxOverlays(id, chained, configs, loadOverlaySettings());
+}
+
 export async function startSelectedProfile(): Promise<void> {
   const selectedId = selectedProfileId();
   if (selectedId === null) {
     throw new Error("no profile selected");
   }
   const content = await readFile(contentPath(selectedId), "utf-8");
-  await startServiceWithContent(applyChainBindings(selectedId, content));
+  await startServiceWithContent(await overlaidContent(selectedId, content));
 }
 
 let updateTimer: NodeJS.Timeout | null = null;

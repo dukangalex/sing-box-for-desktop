@@ -25,7 +25,7 @@ import {
 import type { RuntimeCrashCaptureResult } from "./appReports";
 import { registerApplication } from "./application";
 import { registerDaemonBridge } from "./bridge";
-import { registerCore } from "./core";
+import { registerCloudBackup } from "./cloudBackup";
 import { settingsDatabase } from "./database";
 import { developmentRendererURL, developmentSwitchValue } from "./development";
 import { applyDisplayScaleFactor } from "./displayScale";
@@ -420,7 +420,7 @@ if (!singleInstanceLock) {
 } else {
   app.setAsDefaultProtocolClient("sing-box");
   if (process.platform === "win32") {
-    app.setAppUserModelId("io.nekohasekai.sfw");
+    app.setAppUserModelId("io.chainbox.desktop");
   }
 
   app.on("second-instance", (_event, argv, workingDirectory) => {
@@ -488,6 +488,7 @@ if (!singleInstanceLock) {
     registerProfileChains();
     registerServers();
     registerSettings(updateTrayVisibility);
+    registerCloudBackup();
     registerTaildrop();
     registerNotifications(handleNotificationOpen);
     registerUpdates();

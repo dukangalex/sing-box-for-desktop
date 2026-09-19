@@ -9,7 +9,7 @@ export interface WindowsInstallationLayout {
   daemonDataDirectory: string;
 }
 
-const installationRegistryPath = String.raw`SOFTWARE\SagerNet\sing-box`;
+const installationRegistryPath = String.raw`SOFTWARE\AngelaBox\desktop`;
 
 const installationLayoutScript = String.raw`
 $ErrorActionPreference = "Stop"
@@ -19,7 +19,7 @@ $applicationDataDirectory = $env:sing_box_default_application_data_directory
 $commonApplicationData = [Environment]::GetFolderPath(
   [Environment+SpecialFolder]::CommonApplicationData
 )
-$daemonDataDirectory = Join-Path $commonApplicationData "sing-box-daemon"
+$daemonDataDirectory = Join-Path $commonApplicationData "angelabox-daemon"
 
 $registryView = if ([Environment]::Is64BitOperatingSystem) {
   [Microsoft.Win32.RegistryView]::Registry64
@@ -37,7 +37,7 @@ try {
       $layoutVersion = $installationKey.GetValue("LayoutVersion", $null)
       if ($null -ne $layoutVersion) {
         if ([int]$layoutVersion -ne 2) {
-          throw "Unsupported sing-box installation layout version: $layoutVersion"
+          throw "Unsupported AngelaBox installation layout version: $layoutVersion"
         }
         $configuredApplicationDataDirectory = $installationKey.GetValue(
           "ApplicationDataDirectory",
@@ -52,7 +52,7 @@ try {
         if ($configuredApplicationDataDirectory -isnot [string] -or
             $configuredDaemonDataDirectory -isnot [string] -or
             [string]::IsNullOrWhiteSpace($configuredDaemonDataDirectory)) {
-          throw "The sing-box installation layout is invalid."
+          throw "The AngelaBox installation layout is invalid."
         }
         if (-not [string]::IsNullOrWhiteSpace($configuredApplicationDataDirectory)) {
           $applicationDataDirectory = $configuredApplicationDataDirectory

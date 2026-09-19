@@ -1,17 +1,17 @@
 {
-  "name": "sing-box",
-  "desktopName": "sing-box.desktop",
+  "name": "angelabox",
+  "desktopName": "AngelaBox.desktop",
   "private": true,
-  "description": "Windows and Linux client for sing-box, the universal proxy platform.",
-  "homepage": "https://github.com/sagernet/sing-box-for-desktop",
+  "description": "Windows and Linux client for AngelaBox, based on sing-box.",
+  "homepage": "https://github.com/dukangalex/AngelaBox",
   "license": "GPL-3.0-or-later",
   "author": {
-    "name": "SagerNet",
+    "name": "AngelaBox",
     "email": "contact-sagernet@sekai.icu"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SagerNet/sing-box-for-desktop.git"
+    "url": "git+https://github.com/dukangalex/sing-box-for-desktop.git"
   },
   "type": "module",
   "packageManager": "pnpm@11.13.0",

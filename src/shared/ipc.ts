@@ -322,6 +322,7 @@ export interface ReportsBridge {
 }
 
 export const SETTINGS_CALL = "settings:call";
+export const CLOUD_BACKUP_CALL = "cloudBackup:call";
 export const APP_CALL = "app:call";
 export const APP_TITLE_BAR_OVERLAY = "app:title-bar-overlay";
 export const DEEP_LINK_IMPORT = "app:deep-link-import";
@@ -364,6 +365,48 @@ export interface SettingsBridge {
   setPowerReportEnabled(value: boolean): Promise<void>;
   cacheSize(): Promise<number>;
   clearCache(): Promise<void>;
+}
+
+export interface CloudBackupAccount {
+  url: string;
+  user: string;
+  password: string;
+  remoteFile: string;
+}
+
+export interface OverlayFlags {
+  chinaDirect: boolean;
+  adsBlock: boolean;
+  strictRoute: boolean;
+  dnsProtect: boolean;
+  disableIpv6: boolean;
+  disableQuic: boolean;
+  excludeCnQuic: boolean;
+  webrtcProtect: boolean;
+  onDemand: boolean;
+  configNormalize: boolean;
+  autoRedirect: boolean;
+}
+
+export interface CloudBackupSnapshot {
+  account: CloudBackupAccount;
+  overlay: OverlayFlags;
+}
+
+export interface CloudBackupRestoreResult {
+  imported: number;
+  skipped: number;
+}
+
+export interface CloudBackupBridge {
+  get(): Promise<CloudBackupSnapshot>;
+  saveAccount(account: CloudBackupAccount): Promise<void>;
+  saveOverlay(flags: OverlayFlags): Promise<void>;
+  probe(): Promise<boolean>;
+  upload(): Promise<void>;
+  download(compat: boolean): Promise<CloudBackupRestoreResult>;
+  exportFile(): Promise<boolean>;
+  importFile(compat: boolean): Promise<CloudBackupRestoreResult | null>;
 }
 
 export const UPDATES_CALL = "updates:call";
@@ -492,6 +535,7 @@ export interface DesktopBridge {
   profileEditor: ProfileEditorBridge;
   openConnectBrowser: OpenConnectBrowserBridge;
   settings: SettingsBridge;
+  cloudBackup: CloudBackupBridge;
   updates: UpdatesBridge;
   taildrop: TaildropBridge;
   app: AppBridge;

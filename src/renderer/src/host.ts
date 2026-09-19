@@ -242,6 +242,7 @@ export function createDesktopHost(): DesktopHost {
       cacheSize: () => bridge.settings.cacheSize(),
       clearCache: () => bridge.settings.clearCache(),
     },
+    cloudBackup: bridge.cloudBackup,
     updates: bridge.updates,
     taildrop: bridge.taildrop,
     application: {

@@ -17,9 +17,9 @@ if (process.platform === "win32" && app.isPackaged) {
 } else {
   const defaultSocketPath =
     process.platform === "win32"
-      ? "\\\\.\\pipe\\ProtectedPrefix\\Administrators\\sing-box"
+      ? "\\\\.\\pipe\\ProtectedPrefix\\Administrators\\angelabox"
       : process.platform === "linux"
-        ? "/run/sing-box.socket"
+        ? "/run/angelabox.socket"
         : null;
   const socketPath = developmentSwitchValue("daemon-socket") || defaultSocketPath;
   if (!socketPath) {

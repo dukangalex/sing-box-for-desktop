@@ -33,6 +33,7 @@ import {
   REPORTS_CALL,
   SERVERS_CALL,
   SETTINGS_CALL,
+  CLOUD_BACKUP_CALL,
   SETUP_CALL,
   TAILDROP_DOWNLOAD,
   TAILDROP_DOWNLOAD_PROGRESS,
@@ -80,6 +81,10 @@ function callProfileChains<T>(method: string, ...callArguments: unknown[]): Prom
 
 function callSettings<T>(method: string, ...callArguments: unknown[]): Promise<T> {
   return callResult(SETTINGS_CALL, method, ...callArguments);
+}
+
+function callCloudBackup<T>(method: string, ...callArguments: unknown[]): Promise<T> {
+  return callResult(CLOUD_BACKUP_CALL, method, ...callArguments);
 }
 
 function callServers<T>(method: string, ...callArguments: unknown[]): Promise<T> {
@@ -284,6 +289,16 @@ const bridge: DesktopBridge = {
     setPowerReportEnabled: (value) => callSettings("setPowerReportEnabled", value),
     cacheSize: () => callSettings("cacheSize"),
     clearCache: () => callSettings("clearCache"),
+  },
+  cloudBackup: {
+    get: () => callCloudBackup("get"),
+    saveAccount: (account) => callCloudBackup("saveAccount", account),
+    saveOverlay: (flags) => callCloudBackup("saveOverlay", flags),
+    probe: () => callCloudBackup("probe"),
+    upload: () => callCloudBackup("upload"),
+    download: (compat) => callCloudBackup("download", compat),
+    exportFile: () => callCloudBackup("exportFile"),
+    importFile: (compat) => callCloudBackup("importFile", compat),
   },
   updates: {
     state: () => callResult(UPDATES_CALL, "state"),

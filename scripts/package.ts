@@ -263,7 +263,7 @@ async function runWindowsElectronBuilder(
   artifactArchitecture: string,
   signingConfiguration: WindowsSigningConfiguration,
 ): Promise<void> {
-  const artifactName = `SFW-\${version}-${artifactArchitecture}${developmentPackage ? "-dev" : ""}.\${ext}`;
+  const artifactName = `AngelaBox-windows-\${version}-${artifactArchitecture}${developmentPackage ? "-dev" : ""}.\${ext}`;
   const unpackedDirectory = {
     x64: "win-unpacked",
     x86: "win-ia32-unpacked",
