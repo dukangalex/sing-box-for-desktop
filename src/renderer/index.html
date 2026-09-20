@@ -18,19 +18,27 @@
           : "default";
     </script>
     <style>
+      html, body {
+        margin: 0;
+        background: #1e1e1e;
+      }
       #splash {
         position: fixed;
         inset: 0;
         display: flex;
+        flex-direction: column;
+        gap: 12px;
         align-items: center;
         justify-content: center;
+        color: #e6e6e6;
+        font: 15px/1.4 system-ui, sans-serif;
       }
       #splash span {
         box-sizing: border-box;
-        width: 21px;
-        height: 21px;
-        border: 2px solid var(--neutral-soft, transparent);
-        border-top-color: var(--accent, transparent);
+        width: 28px;
+        height: 28px;
+        border: 2px solid #3a3a3a;
+        border-top-color: #e6e6e6;
         border-radius: 50%;
         animation: splash-spin 0.8s linear infinite;
       }
@@ -43,7 +51,7 @@
   </head>
   <body>
     <div id="root">
-      <div id="splash"><span></span></div>
+      <div id="splash"><span></span><div>AngelaBox</div></div>
     </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

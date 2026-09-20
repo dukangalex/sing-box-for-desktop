@@ -81,6 +81,13 @@ class DaemonState extends EventEmitter {
     let attempt = 0;
     for (;;) {
       try {
+        const probe = await probeService();
+        if (probe === "not-installed" || probe === "not-running") {
+          this.setConnection({ phase: probe });
+          attempt = 0;
+          await this.interruptibleSleep(RECONNECT_DELAY);
+          continue;
+        }
         const info = await desktopService!.getDaemonInfo({}, { timeoutMs: HANDSHAKE_TIMEOUT });
         const bundledVersion = await bundledDaemonVersion();
         if (bundledVersion !== null && info.version !== bundledVersion) {
@@ -117,8 +124,10 @@ class DaemonState extends EventEmitter {
       } catch (error) {
         attempt++;
         const probe = await probeService();
-        if (probe === "not-installed" || probe === "not-running") {
+        if (probe === "not-running") {
           this.setConnection({ phase: probe });
+        } else if (probe === "not-installed" || probe === null) {
+          this.setConnection({ phase: "not-installed" });
         } else {
           this.setConnection({
             phase: "unavailable",
