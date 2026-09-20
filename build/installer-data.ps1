@@ -21,7 +21,7 @@ function Initialize-TransitionStateStorage() {
         [Environment+SpecialFolder]::CommonApplicationData
     )
     $expectedPath = Join-Path `
-        (Join-Path $commonApplicationData "sing-box-installer") `
+        (Join-Path $commonApplicationData "AngelaBox-installer") `
         "data-transition.json"
     if (-not [System.IO.Path]::GetFullPath($StatePath).Equals(
             [System.IO.Path]::GetFullPath($expectedPath),

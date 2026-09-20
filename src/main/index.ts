@@ -67,9 +67,9 @@ function fatalErrorMessage(error: unknown, capture: RuntimeCrashCaptureResult): 
   const errorObject = error instanceof Error ? error : new Error(String(error));
   const reason = `${errorObject.name}: ${errorObject.message}`;
   if (capture.reportPath !== null) {
-    return `sing-box stopped unexpectedly.\n\n${reason}\n\nCrash report:\n${capture.reportPath}`;
+    return `AngelaBox stopped unexpectedly.\n\n${reason}\n\nCrash report:\n${capture.reportPath}`;
   }
-  return `sing-box stopped unexpectedly.\n\n${reason}\n\nThe crash report could not be saved:\n${capture.saveError ?? "unknown error"}`;
+  return `AngelaBox stopped unexpectedly.\n\n${reason}\n\nThe crash report could not be saved:\n${capture.saveError ?? "unknown error"}`;
 }
 
 function handleFatal(kind: string, error: unknown): never {
@@ -80,7 +80,7 @@ function handleFatal(kind: string, error: unknown): never {
   const capture = captureRuntimeCrash(kind, error);
   const message = fatalErrorMessage(error, capture);
   try {
-    dialog.showErrorBox("sing-box", message);
+    dialog.showErrorBox("AngelaBox", message);
   } catch (dialogError) {
     process.stderr.write(`${message}\n\nFailed to show the error dialog: ${String(dialogError)}\n`);
   }
@@ -138,6 +138,8 @@ function createWindow(): BrowserWindow {
       restoredBounds?.height ?? MAIN_WINDOW_MINIMUM_HEIGHT,
     ),
     show: false,
+    title: "AngelaBox",
+    backgroundColor: "#1e1e1e",
     titleBarStyle: process.platform === "darwin" ? "hiddenInset" : "hidden",
     trafficLightPosition: process.platform === "darwin" ? { x: 18, y: 19 } : undefined,
     titleBarOverlay: titleBarOverlay(),
@@ -457,6 +459,7 @@ if (!singleInstanceLock) {
   });
 
   void app.whenReady().then(async () => {
+    app.setName("AngelaBox");
     session.defaultSession.setPermissionRequestHandler((_webContents, permission, callback) => {
       callback(permission === "clipboard-sanitized-write");
     });

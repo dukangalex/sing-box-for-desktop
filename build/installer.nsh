@@ -1714,10 +1714,10 @@ FunctionEnd
   !insertmacro registerTaildropVerb
   ${if} $dataMigrationPrepared == 1
     DetailPrint "$(completingDataMigration)"
-  ${endif}
-  !insertmacro executeDataTransition "Commit"
-  ${if} $1 != 0
-    MessageBox MB_OK|MB_ICONEXCLAMATION "$(dataMigrationCleanupFailed)"
+    !insertmacro executeDataTransition "Commit"
+    ${if} $1 != 0
+      MessageBox MB_OK|MB_ICONEXCLAMATION "$(dataMigrationCleanupFailed)"
+    ${endif}
   ${endif}
   StrCpy $4 0
   !insertmacro refreshDesktopShortcutIfPresent "$newDesktopLink" "$oldDesktopLink" $4

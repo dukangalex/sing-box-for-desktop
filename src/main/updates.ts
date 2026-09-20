@@ -23,7 +23,7 @@ import { parseBooleanPreference, Preference } from "./database";
 import { desktopService } from "./daemon";
 import { userAgent } from "./userAgent";
 
-const RELEASES_URL = "https://api.github.com/repos/SagerNet/sing-box/releases";
+const RELEASES_URL = "https://api.github.com/repos/dukangalex/AngelaBox/releases";
 const RELEASES_PER_PAGE = 100;
 const RELEASES_REQUEST_TIMEOUT_MILLISECONDS = 30_000;
 const EXIT_CODE_CANCELLED = 1223;
@@ -230,7 +230,10 @@ function findWindowsAsset(assets: GitHubAsset[]): GitHubAsset | null {
     throw new Error(`unsupported Windows architecture: ${process.arch}`);
   }
   const executables = assets.filter(
-    (asset) => asset.name.startsWith("SFW-") && asset.name.endsWith(".exe"),
+    (asset) =>
+      asset.name.startsWith("AngelaBox-windows-") &&
+      asset.name.endsWith(".exe") &&
+      !asset.name.startsWith("SFW-"),
   );
   for (const token of updateArchitectureTokens) {
     const match = executables.find((asset) => asset.name.endsWith(`-${token}.exe`));
