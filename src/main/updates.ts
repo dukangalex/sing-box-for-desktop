@@ -230,10 +230,7 @@ function findWindowsAsset(assets: GitHubAsset[]): GitHubAsset | null {
     throw new Error(`unsupported Windows architecture: ${process.arch}`);
   }
   const executables = assets.filter(
-    (asset) =>
-      asset.name.startsWith("AngelaBox-windows-") &&
-      asset.name.endsWith(".exe") &&
-      !asset.name.startsWith("SFW-"),
+    (asset) => asset.name.startsWith("AngelaBox-windows-") && asset.name.endsWith(".exe"),
   );
   for (const token of updateArchitectureTokens) {
     const match = executables.find((asset) => asset.name.endsWith(`-${token}.exe`));
