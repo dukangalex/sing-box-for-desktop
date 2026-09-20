@@ -211,6 +211,29 @@ function applyDisableQuic(root: JsonRecord, excludeCn: boolean): void {
   prependRules(routeOf(root), [{ network: "udp", port: 443, action: "reject" }]);
 }
 
+function applyAntiLoop(root: JsonRecord, strictRoute: boolean): void {
+  const route = routeOf(root);
+  route.auto_detect_interface = true;
+  const inbounds = Array.isArray(root.inbounds) ? (root.inbounds as unknown[]) : [];
+  for (const item of inbounds) {
+    const rec = asRecord(item);
+    if (rec === null || rec.type !== "tun") {
+      continue;
+    }
+    rec.auto_route = true;
+    if (strictRoute) {
+      rec.strict_route = true;
+    }
+  }
+  const direct = findDirectTag(outboundsOf(root));
+  prependRules(route, [
+    {
+      process_name: ["AngelaBox.exe", "sing-box-daemon.exe"],
+      outbound: direct,
+    },
+  ]);
+}
+
 function applyDnsProtect(root: JsonRecord): void {
   const dns = asRecord(root.dns) ?? {};
   root.dns = dns;
@@ -281,6 +304,7 @@ export function applyAngelaBoxOverlays(
   if (typeof root !== "object" || root === null) {
     return content;
   }
+  applyAntiLoop(root, settings.strictRoute);
   applyChainBindings(profileId, root, settings.chainBindings, configs);
   if (settings.chinaDirect) {
     applyChinaDirect(root);

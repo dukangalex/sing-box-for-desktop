@@ -142,10 +142,20 @@ test("overlay injects china direct and ads without rewriting missing tags", () =
     ),
   ) as {
     outbounds: Array<{ tag: string; detour?: string }>;
-    route: { rules: Array<{ outbound?: string; action?: string }> };
+    route: {
+      auto_detect_interface?: boolean;
+      rules: Array<{ outbound?: string; action?: string; process_name?: string[] }>;
+    };
   };
   assert.equal(out.outbounds.some((item) => item.tag === "landing"), true);
   assert.equal(out.outbounds.find((item) => item.tag === "proxy")?.detour, "landing");
   assert.equal(out.route.rules.some((rule) => rule.outbound === "direct"), true);
+  assert.equal(out.route.auto_detect_interface, true);
+  assert.equal(
+    out.route.rules.some(
+      (rule) => Array.isArray(rule.process_name) && rule.process_name.includes("AngelaBox.exe"),
+    ),
+    true,
+  );
   assert.equal(out.route.rules.some((rule) => rule.action === "reject"), true);
 });
