@@ -93,8 +93,19 @@ watchTitleBarOverlay();
 const desktop = createDesktopHost();
 configurePreferenceStorage(desktop.preferences);
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <App desktop={desktop} />
-  </StrictMode>,
-);
+try {
+  createRoot(document.getElementById("root")!).render(
+    <StrictMode>
+      <App desktop={desktop} />
+    </StrictMode>,
+  );
+} catch (error) {
+  const splash = document.getElementById("splash");
+  if (splash) {
+    const label = splash.querySelector("div");
+    if (label) {
+      label.textContent = "AngelaBox 无法启动，请卸载后重装 1.0.68。";
+    }
+  }
+  console.error(error);
+}

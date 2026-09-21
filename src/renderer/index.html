@@ -5,17 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AngelaBox</title>
     <script>
-      const storedTheme = window.desktop.preferences.initial.theme;
-      document.documentElement.dataset.theme =
-        storedTheme === "dark" ||
-        (storedTheme !== "light" && matchMedia("(prefers-color-scheme: dark)").matches)
-          ? "dark"
-          : "light";
-      const storedAccent = window.desktop.preferences.initial.accent;
-      document.documentElement.dataset.accent =
-        typeof storedAccent === "string" && /^[a-z]+$/.test(storedAccent)
-          ? storedAccent
-          : "default";
+      try {
+        const storedTheme = window.desktop && window.desktop.preferences && window.desktop.preferences.initial
+          ? window.desktop.preferences.initial.theme
+          : undefined;
+        document.documentElement.dataset.theme =
+          storedTheme === "dark" ||
+          (storedTheme !== "light" && matchMedia("(prefers-color-scheme: dark)").matches)
+            ? "dark"
+            : "light";
+        const storedAccent = window.desktop && window.desktop.preferences && window.desktop.preferences.initial
+          ? window.desktop.preferences.initial.accent
+          : undefined;
+        document.documentElement.dataset.accent =
+          typeof storedAccent === "string" && /^[a-z]+$/.test(storedAccent)
+            ? storedAccent
+            : "default";
+      } catch (e) {
+        document.documentElement.dataset.theme = "dark";
+        document.documentElement.dataset.accent = "default";
+      }
     </script>
     <style>
       html, body {
@@ -32,6 +41,8 @@
         justify-content: center;
         color: #e6e6e6;
         font: 15px/1.4 system-ui, sans-serif;
+        background: #1e1e1e;
+        z-index: 9999;
       }
       #splash span {
         box-sizing: border-box;
@@ -47,12 +58,14 @@
           transform: rotate(360deg);
         }
       }
+      body.app-ready #splash {
+        display: none;
+      }
     </style>
   </head>
   <body>
-    <div id="root">
-      <div id="splash"><span></span><div>AngelaBox</div></div>
-    </div>
+    <div id="splash"><span></span><div>AngelaBox</div></div>
+    <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
