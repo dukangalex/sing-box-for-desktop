@@ -39,7 +39,7 @@ interface WindowControlsOverlay {
 }
 
 function watchTitleBarOverlay() {
-  if (window.desktop.platform === "darwin") {
+  if (window.desktop?.platform === "darwin" || window.desktop == null) {
     return;
   }
   const controlsOverlay = (
@@ -88,12 +88,16 @@ function watchTitleBarOverlay() {
   report();
 }
 
-watchTitleBarOverlay();
-
-const desktop = createDesktopHost();
-configurePreferenceStorage(desktop.preferences);
+try {
+  watchTitleBarOverlay();
+} catch (error) {
+  console.error(error);
+}
 
 try {
+  const desktop = createDesktopHost();
+  configurePreferenceStorage(desktop.preferences);
+
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
       <App desktop={desktop} />
